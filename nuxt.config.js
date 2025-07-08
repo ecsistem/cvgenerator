@@ -69,6 +69,11 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/i18n',
   ],
+  
+  // Server Middleware
+  serverMiddleware: [
+    { path: '/api', handler: '~/server/api' }
+  ],
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
   build: {

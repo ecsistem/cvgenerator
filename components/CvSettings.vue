@@ -346,7 +346,7 @@
         <button
           type="button"
           class="form__btn flex flex-col justify-center"
-          @click="downloadPdf"
+          @click="requestPdfDownload"
         >
           <span>{{ $t('download-cv-pdf') }}</span>
           <span>({{ $t('chrome-recommended') }})</span>
@@ -370,6 +370,14 @@
         >
       </div>
       <!-- CTA -->
+      
+      <!-- PAYMENT MODAL -->
+      <payment-modal 
+        :is-open="showPaymentModal"
+        @close="closePaymentModal"
+        @download-pdf="downloadPdf"
+      />
+      <!-- PAYMENT MODAL -->
     </form>
   </div>
 </template>
@@ -385,6 +393,7 @@ import CvDynamicSection from '~/components/CvDynamicSection.vue';
 import CvDisplayCheckbox from '~/components/CvDisplayCheckbox.vue';
 import CvInputTags from '~/components/CvInputTags.vue';
 import ExpansionPanel from '~/components/ExpansionPanel.vue';
+import PaymentModal from '~/components/PaymentModal.vue';
 import { useCvState } from '~/data/useCvState';
 
 export default Vue.extend({
@@ -394,6 +403,7 @@ export default Vue.extend({
     CvDisplayCheckbox,
     CvInputTags,
     ExpansionPanel,
+    PaymentModal,
   },
   setup() {
     const config = {
@@ -413,6 +423,8 @@ export default Vue.extend({
 
     const { formSettings, uploadCV, resetForm, setUpCvSettings } = useCvState();
     const context = useContext();
+
+    const showPaymentModal = ref(false);
 
     onMounted(setUpCvSettings);
 
@@ -443,11 +455,19 @@ export default Vue.extend({
       );
     });
 
+    function requestPdfDownload(): void {
+      showPaymentModal.value = true;
+    }
+
     function downloadPdf(): void {
       const oldTitle = document.title;
       document.title = `CV_${formSettings.value.name}_${formSettings.value.lastName}_${context.app.i18n.locale}`;
       window.print();
       document.title = oldTitle;
+    }
+
+    function closePaymentModal(): void {
+      showPaymentModal.value = false;
     }
 
     function changeColor(color: string, darker: string): void {
@@ -468,7 +488,10 @@ export default Vue.extend({
 
     return {
       ...config,
+      requestPdfDownload,
       downloadPdf,
+      showPaymentModal,
+      closePaymentModal,
       changeColor,
       formSettings,
       formSettingsHref,
